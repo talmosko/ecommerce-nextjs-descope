@@ -1,7 +1,11 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
+  const session = useSession();
   return (
     <nav className="py-4">
       <div className="container mx-auto flex justify-between items-center">
@@ -29,16 +33,20 @@ const Navbar = () => {
               Admin Dashboard
             </Link>
           </li>
-          <li>
-            <Link className="text-white" href="/login">
-              Log In
-            </Link>
-          </li>
-          <li>
-            <Link className="text-white" href="/register">
-              Sign Up
-            </Link>
-          </li>
+          {session.status === "unauthenticated" && (
+            <li>
+              <button className="text-white" onClick={() => signIn("descope")}>
+                Log In
+              </button>
+            </li>
+          )}
+          {session.status === "authenticated" && (
+            <li>
+              <button className="text-white" onClick={() => signOut()}>
+                Log Out
+              </button>
+            </li>
+          )}
         </ul>
       </div>
     </nav>

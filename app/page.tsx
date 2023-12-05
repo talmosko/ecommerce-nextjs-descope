@@ -1,4 +1,9 @@
+"use client";
+
+import { signIn, signOut, useSession } from "next-auth/react";
+
 const Home = () => {
+  const session = useSession();
   return (
     <div className="text-white text-center">
       <h1 className="text-5xl font-extrabold mb-4">
@@ -9,18 +14,22 @@ const Home = () => {
         experience.
       </p>
       <div className="space-y-4">
-        <a
-          href="/login"
-          className="bg-white text-blue-500 hover:bg-blue-700 text-lg py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
-        >
-          Log In
-        </a>
-        <a
-          href="/register"
-          className="bg-blue-500 text-white hover:bg-blue-700 text-lg py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
-        >
-          Sign Up
-        </a>
+        {session.status === "unauthenticated" && (
+          <button
+            onClick={() => signIn("descope")}
+            className="bg-white text-blue-500 hover:bg-blue-700 text-lg py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Log In
+          </button>
+        )}
+        {session.status === "authenticated" && (
+          <button
+            onClick={() => signOut()}
+            className="bg-blue-500 text-white hover:bg-blue-700 text-lg py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Log Out
+          </button>
+        )}
       </div>
       <p className="mt-8 text-gray-300">
         Not sure where to start?{" "}

@@ -31,6 +31,11 @@ const Home = () => {
           </button>
         )}
       </div>
+      <div>
+        <p className="text-lg text-gray-200 mb-8">
+          Welcome, {session.data?.user?.roles}!
+        </p>
+      </div>
       <p className="mt-8 text-gray-300">
         Not sure where to start?{" "}
         <a href="/catalog" className="text-blue-300 hover:underline">

@@ -14,8 +14,7 @@ const UserDashboard = () => {
       <h1 className="text-4xl font-extrabold text-white text-center mb-8">
         User Dashboard
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {/* User Profile Card */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-xl font-semibold text-gray-800 mb-2">
             User Profile

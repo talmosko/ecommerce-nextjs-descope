@@ -1,14 +1,18 @@
 // pages/api/products/[productId].ts
 
-import products, { type Product } from "@data/products";
+import { Product, connectDB } from "@/db/db";
+import { IProduct } from "@/db/product.schema";
+import products from "@data/products";
+import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const db = await connectDB();
   const { id: productId } = params;
-  const product = products.find((p) => p.id === parseInt(productId));
+  const product = await Product.findById(productId);
   if (!product) {
     return NextResponse.json({ message: "Product not found" }, { status: 404 });
   } else {
@@ -20,16 +24,16 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  await connectDB();
   const { id: productId } = params;
-  const updatedProduct: Product = req.body;
-  const existingProductIndex = products.findIndex(
-    (p) => p.id === parseInt(productId)
-  );
-  if (existingProductIndex === -1) {
+  const product = (await req.json()) as IProduct;
+  const updated = await Product.findOneAndUpdate({ _id: productId }, product, {
+    new: true,
+  });
+  if (!updated) {
     return NextResponse.json({ message: "Product not found" }, { status: 404 });
   } else {
-    products[existingProductIndex] = updatedProduct;
-    return NextResponse.json({ message: "Product updated successfully" });
+    return redirect("/catalog");
   }
 }
 

@@ -6,9 +6,14 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 function Product({ product }: { product: IProduct }) {
   const router = useRouter();
+  const session = useSession();
+  if (!session || !session.data?.user) {
+    return <div>Not logged in</div>;
+  }
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <Image
@@ -30,7 +35,7 @@ function Product({ product }: { product: IProduct }) {
       </a>
       <button
         onClick={async () => {
-          await orderProduct(product, "1111");
+          await orderProduct(product, session.data.user.id);
           router.push("/order-history");
         }}
         className="bg-blue-500 text-white hover:bg-blue-700 w-full py-2 px-4 rounded-md mt-4 block text-center"

@@ -2,9 +2,10 @@
 
 import { Product, connectDB } from "@/db/db";
 import { IProduct } from "@/db/product.schema";
-import products from "@data/products";
+import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function GET(
   req: NextRequest,
@@ -24,6 +25,15 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ message: "Not logged in" }, { status: 401 });
+  }
+
+  if (!session.user.roles.includes("Admin")) {
+    return NextResponse.json({ message: "Not authorized" }, { status: 403 });
+  }
+
   await connectDB();
   const { id: productId } = params;
   const product = (await req.json()) as IProduct;
@@ -41,14 +51,21 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ message: "Not logged in" }, { status: 401 });
+  }
+
+  if (!session.user.roles.includes("Admin")) {
+    return NextResponse.json({ message: "Not authorized" }, { status: 403 });
+  }
+
+  await connectDB();
   const { id: productId } = params;
-  const existingProductIndex = products.findIndex(
-    (p) => p.id === parseInt(productId)
-  );
-  if (existingProductIndex === -1) {
+  const deleted = await Product.findOneAndDelete({ _id: productId });
+  if (!deleted) {
     return NextResponse.json({ message: "Product not found" }, { status: 404 });
   } else {
-    products.splice(existingProductIndex, 1);
-    return NextResponse.json({ message: "Product deleted successfully" });
+    return redirect("/catalog");
   }
 }

@@ -2,6 +2,7 @@
 import { orderProduct } from "@/actions/orders.client";
 import { IProduct } from "@/db/product.schema";
 import { Types } from "mongoose";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 const ProductEdit = () => {
   const { id } = useParams();
   const router = useRouter();
+  const session = useSession();
   const [product, setProduct] = useState<IProduct>({
     _id: new Types.ObjectId(),
     name: "",
@@ -16,6 +18,8 @@ const ProductEdit = () => {
     price: 0,
     image: "",
   });
+
+  const canEdit = session?.data?.user?.roles.includes("Admin");
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -37,6 +41,9 @@ const ProductEdit = () => {
   // Handle form submission (for updating product)
   const saveProduct = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canEdit) {
+      return;
+    }
     const res = await fetch(`/api/products/${id}`, {
       method: "PUT",
       body: JSON.stringify(product),
@@ -47,10 +54,14 @@ const ProductEdit = () => {
     }
   };
 
+  if (!session || !session.data?.user) {
+    return <div>Not logged in</div>;
+  }
+
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-extrabold text-white text-center mb-8">
-        Edit Product
+        {canEdit ? "Edit Product" : "View Product"}
       </h1>
       <Image
         src={product.image}
@@ -67,6 +78,7 @@ const ProductEdit = () => {
             </label>
             <input
               type="text"
+              disabled={!canEdit}
               id="name"
               name="name"
               value={product.name}
@@ -83,6 +95,7 @@ const ProductEdit = () => {
             </label>
             <textarea
               id="description"
+              disabled={!canEdit}
               name="description"
               value={product.description}
               onChange={handleInputChange}
@@ -95,6 +108,7 @@ const ProductEdit = () => {
             </label>
             <input
               type="text"
+              disabled={!canEdit}
               id="price"
               name="price"
               value={product.price}
@@ -103,15 +117,17 @@ const ProductEdit = () => {
             />
           </div>
           <div className="text-center flex flex-col gap-2 w-full m-auto">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white hover:bg-blue-700 py-2 px-4 rounded-md text-lg"
-            >
-              Save Changes
-            </button>
+            {canEdit && (
+              <button
+                type="submit"
+                className="bg-blue-500 text-white hover:bg-blue-700 py-2 px-4 rounded-md text-lg"
+              >
+                Save Changes
+              </button>
+            )}
             <button
               onClick={async () => {
-                const res = await orderProduct(product, "1111");
+                const res = await orderProduct(product, session.data.user.id);
                 if (res.ok) router.push("/order-history");
               }}
               className="bg-blue-500 text-white hover:bg-blue-700 py-2 px-4 rounded-md text-lg"

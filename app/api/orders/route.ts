@@ -1,10 +1,15 @@
 import { Order, connectDB } from "@/db/db";
 import { IOrder } from "@/db/order.schema";
 import { NextRequest, NextResponse } from "next/server";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ message: "Not logged in" }, { status: 401 });
+  }
   await connectDB();
   const order = (await req.json()) as IOrder;
   const inserted = await Order.create(order);
@@ -15,10 +20,4 @@ export async function POST(req: NextRequest) {
   } else {
     return NextResponse.json(inserted, { status: 201 });
   }
-}
-
-export async function GET(req: NextRequest) {
-  await connectDB();
-  const orders = await Order.find({}).populate("product");
-  return NextResponse.json(orders, { status: 200 });
 }

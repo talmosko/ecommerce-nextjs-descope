@@ -1,14 +1,22 @@
 import { IOrder } from "@/db/order.schema";
 import React from "react";
 import { Order, connectDB } from "@/db/db";
-const fetchOrders = async () => {
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+const fetchOrders = async (userId: string) => {
   await connectDB();
-  const orders = await Order.find({}).populate("product");
+  const orders = await Order.find({
+    userId,
+  }).populate("product");
   return orders;
 };
 
 const OrderHistory = async () => {
-  const orders = await fetchOrders();
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return <div>Not logged in</div>;
+  }
+  const orders = await fetchOrders(session.user.id);
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-extrabold text-white text-center mb-8">

@@ -6,6 +6,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
   const session = useSession();
+  const isAuthenticated = session.status === "authenticated";
   return (
     <nav className="py-4">
       <div className="container mx-auto flex gap-4 justify-between items-center">
@@ -13,29 +14,35 @@ const Navbar = () => {
           E-Commerce App
         </Link>
         <ul className="flex gap-4">
-          <li>
-            <Link className="text-white" href="/catalog">
-              Product Catalog
-            </Link>
-          </li>
-          <li>
-            <Link className="text-white" href="/order-history">
-              Order History
-            </Link>
-          </li>
-          <li>
-            <Link className="text-white" href="/user-dashboard">
-              User Dashboard
-            </Link>
-          </li>
-          {session.status === "unauthenticated" && (
+          {isAuthenticated && (
+            <li>
+              <Link className="text-white" href="/catalog">
+                Product Catalog
+              </Link>
+            </li>
+          )}
+          {isAuthenticated && (
+            <li>
+              <Link className="text-white" href="/order-history">
+                Order History
+              </Link>
+            </li>
+          )}
+          {isAuthenticated && (
+            <li>
+              <Link className="text-white" href="/user-dashboard">
+                User Dashboard
+              </Link>
+            </li>
+          )}
+          {!isAuthenticated && (
             <li>
               <button className="text-white" onClick={() => signIn("descope")}>
                 Log In
               </button>
             </li>
           )}
-          {session.status === "authenticated" && (
+          {isAuthenticated && (
             <li>
               <button className="text-white" onClick={() => signOut()}>
                 Log Out

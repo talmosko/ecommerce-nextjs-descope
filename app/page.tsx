@@ -33,7 +33,7 @@ const Home = () => {
       </div>
       <div>
         <p className="text-lg text-gray-200 mb-8">
-          Welcome, {session.data?.user?.roles}!
+          {session && `Welcome, ${session.data?.user?.name}!`}
         </p>
       </div>
       <p className="mt-8 text-gray-300">

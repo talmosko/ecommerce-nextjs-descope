@@ -1,14 +1,13 @@
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import React from "react";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
-const UserDashboard = () => {
-  // Sample user profile data (replace with actual data)
-  const userProfile = {
-    username: "JohnDoe123",
-    email: "johndoe@example.com",
-    avatar: "https://via.placeholder.com/150", // Replace with the actual URL
-  };
-
+const UserDashboard = async () => {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return <div>Not logged in</div>;
+  }
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-extrabold text-white text-center mb-8">
@@ -20,11 +19,11 @@ const UserDashboard = () => {
             User Profile
           </h2>
           <div className="text-gray-600 mb-4">
-            <p>Username: {userProfile.username}</p>
-            <p>Email: {userProfile.email}</p>
+            <p>Username: {session?.user.id}</p>
+            <p>Email: {session?.user.email}</p>
           </div>
           <Image
-            src={userProfile.avatar}
+            src={session?.user.image || ""}
             width={150}
             height={150}
             alt="User Avatar"

@@ -47,4 +47,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Learn More
 
-To learn more about Next.js, Descope, next-auth, visit this [blogpost](https://talmosko.hashnode.dev/preview/656d6cbcbe1891a538ca5e18)
+To learn more about Next.js, Descope, next-auth, visit this [blogpost](https://dev.to/tmosko/streamlining-role-based-access-control-in-nextjs-with-descope-and-authjs-a-step-by-step-guide-hf5)
